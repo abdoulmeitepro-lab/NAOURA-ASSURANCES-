@@ -36,10 +36,6 @@
   --r:14px;
   --wrap:1180px;
 }
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --bg:#05082a;--surface:#0b1038;--surface-2:#121a4a;--card:#0e1440;--ink:#eef3ff;--text:#c4c9e6;--muted:#9aa0c4;--line:#232b5c;
-  --accent:#00b1ef;--accent-ink:#ffffff;--accent-hover:#38c6f7;--accent-soft:#0f2d55;--band:#0b1f55;--band-ink:#eef3ff;--foot:#03051c;--foot-text:#aeb3d8;--foot-line:rgba(255,255,255,.1);
-  --shadow:0 18px 40px -24px rgba(0,0,0,.8);--logo-l:none;--logo-d:block;color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#05082a;--surface:#0b1038;--surface-2:#121a4a;--card:#0e1440;--ink:#eef3ff;--text:#c4c9e6;--muted:#9aa0c4;--line:#232b5c;
   --accent:#00b1ef;--accent-ink:#ffffff;--accent-hover:#38c6f7;--accent-soft:#0f2d55;--band:#0b1f55;--band-ink:#eef3ff;--foot:#03051c;--foot-text:#aeb3d8;--foot-line:rgba(255,255,255,.1);
@@ -134,7 +130,6 @@ p{margin:0}
 .partner .word small{display:block;font-weight:500;font-size:.68rem;letter-spacing:.14em;color:#4b5079;margin-top:3px}
 .client{flex:0 0 auto;display:flex;align-items:center;gap:10px;padding:12px 18px;border-radius:999px;background:var(--card);border:1px solid var(--line);color:var(--ink);font-weight:500;font-size:.92rem;white-space:nowrap}
 .client i{width:28px;height:28px;border-radius:50%;background:var(--accent-soft);display:grid;place-items:center;font-style:normal;font-size:.72rem;font-weight:700;color:var(--ink)}
-@media (prefers-reduced-motion:reduce){.track{animation:none}.marquee{overflow-x:auto}}
 
 /* Plans IARD / VIE */
 .plans{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}
@@ -173,7 +168,6 @@ p{margin:0}
 .dots button{width:10px;height:10px;border-radius:50%;border:0;background:var(--line);cursor:pointer;padding:0}
 .dots button[aria-current="true"]{background:var(--accent);width:26px;border-radius:6px}
 @media (max-width:640px){.c3d{height:380px}.c3d-ring{width:250px;height:290px;margin-left:-125px}.c3d-card{padding:22px}}
-@media (prefers-reduced-motion:reduce){.c3d-ring{transition:none}}
 
 /* Sinistre */
 .claim{display:grid;grid-template-columns:1fr 1.25fr;gap:clamp(28px,5vw,64px);align-items:start}
@@ -391,7 +385,7 @@ html{interpolate-size:allow-keywords}
 .pulse::after{content:"";position:absolute;inset:0;border-radius:50%;background:#00b1ef;animation:ping 1.8s cubic-bezier(0,0,.2,1) infinite}
 @keyframes ping{to{transform:scale(3);opacity:0}}
 @keyframes float{50%{transform:translateY(-10px)}}
-@media (max-width:760px){.hero-badge{display:none}}
+@media (max-width:760px){.hero-badge.b1{display:none}.hero-badge.b2{top:16px;right:16px;padding:8px 12px}.hero-badge.b2 b{font-size:1.5rem}.hero-copy{padding-top:92px}}
 
 /* Partenaires */
 .partner{transition:transform .35s,box-shadow .35s}
@@ -488,7 +482,15 @@ html{interpolate-size:allow-keywords}
 .to-top .bar{fill:none;stroke:var(--accent);stroke-width:3;stroke-linecap:round;stroke-dasharray:100 100;stroke-dashoffset:calc(100 - var(--p,0)*100);transform:rotate(-90deg);transform-origin:center}
 .to-top .arr{fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
 
-@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+/* Réglage « réduire les animations » : on garde les fondus, sans déplacement ni parallaxe */
+.calm [data-r]:not(.in){transform:none!important}
+.calm .split .w>span,.calm .hero-copy h1 .w>span{transform:none!important;animation-name:fadeIn!important}
+.calm .hero-copy>*,.calm .family.enter .acc>*,.calm .family.enter .family-intro,.calm .bio:not([hidden]){animation-name:fadeIn!important}
+.calm .hero-frame>img{animation:none}
+.calm .hero-badge,.calm .cta-card img{animation:fadeIn .8s backwards}
+.calm .stats-band::before,.calm .stats-band::after{animation:none}
+@keyframes fadeIn{from{opacity:0}}
+html.calm{scroll-behavior:auto}
 </style>
 </head>
 <body>
@@ -1032,7 +1034,7 @@ $("#prev").addEventListener("click",function(){step(-1);restart()});
 $("#next").addEventListener("click",function(){step(1);restart()});
 $$("button",dots).forEach(function(d,k){d.addEventListener("click",function(){goTurn(k);restart()})});
 var reduce=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
-function restart(){clearInterval(timer);if(!reduce)timer=setInterval(function(){step(1)},3800)}
+function restart(){clearInterval(timer);timer=setInterval(function(){step(1)},3800)}
 var c3=$("#c3d");c3.addEventListener("mouseenter",function(){clearInterval(timer)});c3.addEventListener("mouseleave",restart);
 var sx=null;c3.addEventListener("touchstart",function(e){sx=e.touches[0].clientX},{passive:true});
 c3.addEventListener("touchend",function(e){if(sx===null)return;var dx=e.changedTouches[0].clientX-sx;if(Math.abs(dx)>40){step(dx<0?1:-1);restart()}sx=null});
@@ -1133,7 +1135,7 @@ route();
 $("#menu").addEventListener("click",function(){var o=$("#nav").classList.toggle("open");this.setAttribute("aria-expanded",o)});
 
 /* Thème */
-$("#theme").addEventListener("click",function(){var r=document.documentElement,cur=r.getAttribute("data-theme");var dark=cur?cur==="dark":matchMedia("(prefers-color-scheme: dark)").matches;r.setAttribute("data-theme",dark?"light":"dark");try{localStorage.setItem("naoura-theme",dark?"light":"dark")}catch(e){}});
+$("#theme").addEventListener("click",function(){var r=document.documentElement,cur=r.getAttribute("data-theme");var dark=cur==="dark";r.setAttribute("data-theme",dark?"light":"dark");try{localStorage.setItem("naoura-theme",dark?"light":"dark")}catch(e){}});
 try{var t=localStorage.getItem("naoura-theme");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}
 
 /* Formulaires : préparent un e-mail vers l'assistante */
@@ -1165,7 +1167,7 @@ var $=function(s,r){return (r||document).querySelector(s)},$$=function(s,r){retu
 var root=document.documentElement;
 var reduce=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
 var fine=window.matchMedia&&matchMedia("(pointer: fine)").matches;
-if(!reduce)root.classList.add("anim");
+root.classList.add("anim");if(reduce)root.classList.add("calm");
 
 /* Titres découpés en mots, qui montent un par un */
 function split(el){
@@ -1212,7 +1214,7 @@ function count(el){
   function f(t){if(t0===null)t0=t;var p=Math.min((t-t0)/dur,1),e=p===1?1:1-Math.pow(2,-10*p);el.textContent=Math.round(start+(end-start)*e)+suf;if(p<1)requestAnimationFrame(f)}
   requestAnimationFrame(f);
 }
-var cio=("IntersectionObserver" in window)?new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){cio.unobserve(e.target);if(!reduce)count(e.target)}})},{threshold:.6}):null;
+var cio=("IntersectionObserver" in window)?new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){cio.unobserve(e.target);count(e.target)}})},{threshold:.6}):null;
 
 function arm(scope){
   if(!io)return;
@@ -1220,17 +1222,17 @@ function arm(scope){
   $$("[data-r]",scope).forEach(function(el){el.classList.remove("in","done");var t=el.getAttribute("data-r")==="clip"?el.parentNode:el;t._rev=(t._rev||[]).filter(function(x){return x!==el}).concat(el);io.observe(t)});
   $$("[data-count]",scope).forEach(function(el){cio.observe(el)});
 }
-if(!reduce)arm(document);
+arm(document);
 
 /* Onglets IARD / VIE : pastille glissante et entrée des produits */
 var tabs=$(".tabs"),ind=$(".tabs .ind");
 tabs.classList.add("has-ind");
 function placeInd(){var b=$('[aria-selected="true"]',tabs);if(!b||!b.offsetWidth)return;ind.style.width=b.offsetWidth+"px";ind.style.transform="translateX("+b.offsetLeft+"px)"}
-function enterFamily(){var f=$(".family:not([hidden])");if(!f||reduce)return;f.classList.remove("enter");void f.offsetWidth;f.classList.add("enter")}
+function enterFamily(){var f=$(".family:not([hidden])");if(!f)return;f.classList.remove("enter");void f.offsetWidth;f.classList.add("enter")}
 document.addEventListener("naoura:tab",function(){placeInd();enterFamily()});
 document.addEventListener("naoura:view",function(e){
   var v=$('[data-view="'+e.detail+'"]');
-  if(!reduce&&v)arm(v);
+  if(v)arm(v);
   if(e.detail==="services")requestAnimationFrame(function(){placeInd();enterFamily()});
   frame();
 });
